@@ -103,7 +103,7 @@ export default function StockList({ items }: { items: StockItem[] }) {
   }
 
   return (
-    <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
+    <div className="relative rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
@@ -134,7 +134,14 @@ export default function StockList({ items }: { items: StockItem[] }) {
         </p>
       ) : (
         <>
-          <p className="mb-4 mt-1.5 text-sm text-[var(--muted)]">
+          <button
+            type="button"
+            aria-label="ストックを閉じる"
+            onClick={() => setIsOpen(false)}
+            className="fixed inset-0 z-10 cursor-default"
+          />
+          <div className="absolute inset-x-0 top-full z-20 mt-2 max-h-[70vh] overflow-y-auto rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-lg">
+          <p className="mb-4 text-sm text-[var(--muted)]">
             あとでやりたいことを書き溜めておけます。「開始」を押すと、その場でタイマーが始まります。
           </p>
 
@@ -272,6 +279,7 @@ export default function StockList({ items }: { items: StockItem[] }) {
       )}
 
           {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+          </div>
         </>
       )}
     </div>
