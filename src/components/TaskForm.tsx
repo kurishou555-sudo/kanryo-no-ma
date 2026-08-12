@@ -23,8 +23,8 @@ export default function TaskForm({
   initialTitle?: string;
 }) {
   const [title, setTitle] = useState(initialTitle);
+  const [minutes, setMinutes] = useState(5);
   const [customTime, setCustomTime] = useState(() => defaultTimeString(5));
-  const [customMinutes, setCustomMinutes] = useState("");
   const [localError, setLocalError] = useState("");
 
   function submitWithDeadline(deadline: Date) {
@@ -35,22 +35,17 @@ export default function TaskForm({
     }
     onCreate(title, deadline.toISOString());
     setTitle("");
+    setMinutes(5);
     setCustomTime(defaultTimeString(5));
   }
 
-  function handleQuick(minutes: number) {
-    submitWithDeadline(new Date(Date.now() + minutes * 60 * 1000));
-  }
-
-  function handleCustomMinutesSubmit(e: FormEvent) {
+  function handleMinutesSubmit(e: FormEvent) {
     e.preventDefault();
-    const minutes = Number(customMinutes);
-    if (!customMinutes || !Number.isFinite(minutes) || minutes <= 0) {
+    if (!Number.isFinite(minutes) || minutes <= 0) {
       setLocalError("分数を入力してください");
       return;
     }
     submitWithDeadline(new Date(Date.now() + minutes * 60 * 1000));
-    setCustomMinutes("");
   }
 
   function handleCustomSubmit(e: FormEvent) {
@@ -95,59 +90,64 @@ export default function TaskForm({
       <p className="mb-2 text-sm font-medium text-[var(--muted)]">
         いつまでに?
       </p>
-      <div className="mb-4 flex flex-wrap gap-2">
-        {QUICK_OPTIONS.map((m) => (
-          <button
-            key={m}
-            type="button"
-            disabled={isPending}
-            onClick={() => handleQuick(m)}
-            className="rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2 text-sm font-medium text-[var(--foreground)] transition-colors active:bg-[var(--accent-dim)] active:border-[var(--accent)] disabled:opacity-50"
-          >
-            {m}分後
-          </button>
-        ))}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-2">
-        <form onSubmit={handleCustomSubmit} className="flex items-center gap-2">
-          <input
-            type="time"
-            value={customTime}
-            onChange={(e) => setCustomTime(e.target.value)}
-            className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-base text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
-          />
+      <form onSubmit={handleMinutesSubmit} className="mb-4">
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          {QUICK_OPTIONS.map((m) => (
+            <button
+              key={m}
+              type="button"
+              disabled={isPending}
+              onClick={() => setMinutes(m)}
+              className={`rounded-full border px-4 py-2 text-sm font-medium disabled:opacity-50 ${
+                minutes === m
+                  ? "border-[var(--accent)] bg-[var(--accent-dim)] text-[var(--accent)]"
+                  : "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--foreground)]"
+              }`}
+            >
+              {m}分後
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="flex items-center gap-1 text-sm text-[var(--muted)]">
+            <input
+              type="number"
+              inputMode="numeric"
+              min={1}
+              value={minutes}
+              onChange={(e) => setMinutes(Number(e.target.value))}
+              className="w-16 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-2 py-2 text-center text-base text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
+            />
+            分後
+          </span>
           <button
             type="submit"
             disabled={isPending}
             className="rounded-xl bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--accent-foreground)] disabled:opacity-50"
           >
-            この時刻でセット
+            セット
           </button>
-        </form>
+        </div>
+      </form>
 
-        <form
-          onSubmit={handleCustomMinutesSubmit}
-          className="flex items-center gap-2"
+      <p className="mb-2 text-sm font-medium text-[var(--muted)]">
+        または時刻を指定
+      </p>
+      <form onSubmit={handleCustomSubmit} className="flex items-center gap-2">
+        <input
+          type="time"
+          value={customTime}
+          onChange={(e) => setCustomTime(e.target.value)}
+          className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-base text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
+        />
+        <button
+          type="submit"
+          disabled={isPending}
+          className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2 text-sm font-medium text-[var(--foreground)] hover:border-[var(--accent)] disabled:opacity-50"
         >
-          <input
-            type="number"
-            inputMode="numeric"
-            min={1}
-            value={customMinutes}
-            onChange={(e) => setCustomMinutes(e.target.value)}
-            placeholder="分数"
-            className="w-20 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-base text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent)]"
-          />
-          <button
-            type="submit"
-            disabled={isPending}
-            className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2 text-sm font-medium text-[var(--foreground)] hover:border-[var(--accent)] disabled:opacity-50"
-          >
-            分後にセット
-          </button>
-        </form>
-      </div>
+          この時刻でセット
+        </button>
+      </form>
 
       {displayError && (
         <p className="mt-3 text-sm text-red-400">{displayError}</p>
