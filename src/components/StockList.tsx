@@ -4,6 +4,8 @@ import { useState, useTransition, type FormEvent } from "react";
 import { addStockItem, deleteStockItem, startStockItem } from "@/app/actions";
 import type { StockItem } from "@/lib/types";
 
+const DURATION_OPTIONS = [5, 15, 30, 60];
+
 function TrashIcon() {
   return (
     <svg
@@ -22,8 +24,29 @@ function TrashIcon() {
   );
 }
 
+function RepeatIcon() {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-3 w-3"
+    >
+      <path d="M4 8a5 5 0 0 1 8.5-3.5L14 6" />
+      <path d="M14 3v3.5h-3.5" />
+      <path d="M16 12a5 5 0 0 1-8.5 3.5L6 14" />
+      <path d="M6 17v-3.5h3.5" />
+    </svg>
+  );
+}
+
 export default function StockList({ items }: { items: StockItem[] }) {
   const [title, setTitle] = useState("");
+  const [duration, setDuration] = useState(5);
+  const [isRoutine, setIsRoutine] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
 
@@ -33,8 +56,10 @@ export default function StockList({ items }: { items: StockItem[] }) {
     setError("");
     startTransition(async () => {
       try {
-        await addStockItem(title);
+        await addStockItem(title, duration, isRoutine);
         setTitle("");
+        setDuration(5);
+        setIsRoutine(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : "追加に失敗しました");
       }
@@ -43,10 +68,9 @@ export default function StockList({ items }: { items: StockItem[] }) {
 
   function handleStart(stockId: string) {
     setError("");
-    const deadline = new Date(Date.now() + 5 * 60 * 1000);
     startTransition(async () => {
       try {
-        await startStockItem(stockId, deadline.toISOString());
+        await startStockItem(stockId);
       } catch (err) {
         setError(err instanceof Error ? err.message : "開始に失敗しました");
       }
@@ -65,23 +89,52 @@ export default function StockList({ items }: { items: StockItem[] }) {
         ストック
       </h2>
       <p className="mb-4 text-xs text-[var(--muted)]">
-        あとでやりたいことを書き溜めておけます。「開始」を押すと、その場で5分のタイマーが始まります。
+        あとでやりたいことを書き溜めておけます。「開始」を押すと、その場でタイマーが始まります。
       </p>
 
-      <form onSubmit={handleAdd} className="mb-4 flex items-center gap-2">
+      <form onSubmit={handleAdd} className="mb-4">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="例: メール返信"
-          className="min-w-0 flex-1 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2.5 text-base text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent)]"
+          className="mb-2 w-full rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2.5 text-base text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent)]"
         />
-        <button
-          type="submit"
-          disabled={isPending}
-          className="shrink-0 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2.5 text-sm font-medium text-[var(--foreground)] hover:border-[var(--accent)] disabled:opacity-50"
-        >
-          追加
-        </button>
+
+        <div className="mb-2 flex flex-wrap gap-2">
+          {DURATION_OPTIONS.map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setDuration(m)}
+              className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                duration === m
+                  ? "border-[var(--accent)] bg-[var(--accent-dim)] text-[var(--accent)]"
+                  : "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--foreground)]"
+              }`}
+            >
+              {m}分
+            </button>
+          ))}
+        </div>
+
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <label className="flex items-center gap-2 text-xs text-[var(--muted)]">
+            <input
+              type="checkbox"
+              checked={isRoutine}
+              onChange={(e) => setIsRoutine(e.target.checked)}
+              className="h-4 w-4 accent-[var(--accent)]"
+            />
+            毎日のルーティン(開始しても消えません)
+          </label>
+          <button
+            type="submit"
+            disabled={isPending}
+            className="shrink-0 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2 text-sm font-medium text-[var(--foreground)] hover:border-[var(--accent)] disabled:opacity-50"
+          >
+            追加
+          </button>
+        </div>
       </form>
 
       {items.length === 0 ? (
@@ -93,7 +146,20 @@ export default function StockList({ items }: { items: StockItem[] }) {
               key={item.id}
               className="flex items-center justify-between gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm"
             >
-              <span className="text-[var(--foreground)]">{item.title}</span>
+              <div className="min-w-0">
+                <p className="truncate text-[var(--foreground)]">
+                  {item.title}
+                </p>
+                <p className="mt-0.5 flex items-center gap-1.5 text-xs text-[var(--muted)]">
+                  {item.duration_minutes}分
+                  {item.is_routine && (
+                    <span className="flex items-center gap-1 rounded-full bg-[var(--accent-dim)] px-1.5 py-0.5 text-[var(--accent)]">
+                      <RepeatIcon />
+                      ルーティン
+                    </span>
+                  )}
+                </p>
+              </div>
               <div className="flex shrink-0 items-center gap-2">
                 <button
                   type="button"

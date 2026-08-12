@@ -102,8 +102,15 @@ create table if not exists public.task_stock (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   title text not null check (char_length(trim(title)) > 0),
+  duration_minutes integer not null default 5,
+  is_routine boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+alter table public.task_stock
+  add column if not exists duration_minutes integer not null default 5;
+alter table public.task_stock
+  add column if not exists is_routine boolean not null default false;
 
 create index if not exists task_stock_user_id_idx on public.task_stock (user_id);
 

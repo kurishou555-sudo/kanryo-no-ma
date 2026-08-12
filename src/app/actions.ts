@@ -175,7 +175,11 @@ export async function updateDisplayName(displayName: string) {
   revalidatePath("/timeline");
 }
 
-export async function addStockItem(title: string) {
+export async function addStockItem(
+  title: string,
+  durationMinutes: number,
+  isRoutine: boolean
+) {
   const supabase = await createClient();
   const {
     data: { session },
@@ -186,9 +190,12 @@ export async function addStockItem(title: string) {
   const trimmed = title.trim();
   if (!trimmed) throw new Error("内容を入力してください");
 
-  const { error } = await supabase
-    .from("task_stock")
-    .insert({ user_id: user.id, title: trimmed });
+  const { error } = await supabase.from("task_stock").insert({
+    user_id: user.id,
+    title: trimmed,
+    duration_minutes: durationMinutes,
+    is_routine: isRoutine,
+  });
 
   if (error) throw new Error(error.message);
 
@@ -214,7 +221,7 @@ export async function deleteStockItem(stockId: string) {
   revalidatePath("/dashboard");
 }
 
-export async function startStockItem(stockId: string, deadlineAt: string) {
+export async function startStockItem(stockId: string) {
   const supabase = await createClient();
   const {
     data: { session },
@@ -224,12 +231,16 @@ export async function startStockItem(stockId: string, deadlineAt: string) {
 
   const { data: stockItem, error: fetchError } = await supabase
     .from("task_stock")
-    .select("title")
+    .select("title, duration_minutes, is_routine")
     .eq("id", stockId)
     .eq("user_id", user.id)
     .single();
 
   if (fetchError || !stockItem) throw new Error("ストックが見つかりません");
+
+  const deadlineAt = new Date(
+    Date.now() + stockItem.duration_minutes * 60 * 1000
+  ).toISOString();
 
   const { error: insertError } = await supabase.from("tasks").insert({
     user_id: user.id,
@@ -244,7 +255,10 @@ export async function startStockItem(stockId: string, deadlineAt: string) {
     throw new Error(insertError.message);
   }
 
-  await supabase.from("task_stock").delete().eq("id", stockId);
+  // ルーティン指定のものは削除せず、翌日以降も再利用できるように残す
+  if (!stockItem.is_routine) {
+    await supabase.from("task_stock").delete().eq("id", stockId);
+  }
 
   revalidatePath("/dashboard");
 }

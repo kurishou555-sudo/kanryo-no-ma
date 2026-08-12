@@ -5,6 +5,7 @@ import TaskSection from "@/components/TaskSection";
 import TaskHistory from "@/components/TaskHistory";
 import StockList from "@/components/StockList";
 import DisplayNameEditor from "@/components/DisplayNameEditor";
+import LoginSplash from "@/components/LoginSplash";
 import type { Task, Profile, StockItem } from "@/lib/types";
 
 export default async function DashboardPage() {
@@ -41,27 +42,34 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen pb-24">
+      <LoginSplash />
       <NavBar />
-      <main className="mx-auto max-w-lg px-4 py-6">
+      <main className="mx-auto max-w-5xl px-4 py-6">
         <DisplayNameEditor
           displayName={typedProfile?.display_name ?? ""}
           displayNameSet={typedProfile?.display_name_set ?? false}
         />
 
-        <section className="mt-6">
-          <TaskSection initialActiveTask={(activeTask as Task | null) ?? null} />
-        </section>
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
+          <section>
+            <TaskSection
+              initialActiveTask={(activeTask as Task | null) ?? null}
+            />
+          </section>
 
-        <section className="mt-6">
-          <StockList items={(stock as StockItem[]) ?? []} />
-        </section>
+          <div className="space-y-6">
+            <section>
+              <StockList items={(stock as StockItem[]) ?? []} />
+            </section>
 
-        <section className="mt-10">
-          <h2 className="mb-3 text-sm font-semibold text-[var(--muted)]">
-            自分のタスク履歴
-          </h2>
-          <TaskHistory tasks={(history as Task[]) ?? []} />
-        </section>
+            <section>
+              <h2 className="mb-3 text-sm font-semibold text-[var(--muted)]">
+                自分のタスク履歴
+              </h2>
+              <TaskHistory tasks={(history as Task[]) ?? []} />
+            </section>
+          </div>
+        </div>
       </main>
     </div>
   );

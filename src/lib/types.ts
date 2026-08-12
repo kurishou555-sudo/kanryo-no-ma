@@ -26,5 +26,7 @@ export type StockItem = {
   id: string;
   user_id: string;
   title: string;
+  duration_minutes: number;
+  is_routine: boolean;
   created_at: string;
 };
