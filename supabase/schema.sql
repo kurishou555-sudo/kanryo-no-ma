@@ -133,6 +133,7 @@ create policy "task_stock_update_own" on public.task_stock
   for update using (auth.uid() = user_id);
 
 -- ランキング用の集計ビュー(個々のタスクの中身は見せず、件数だけを公開する)
+-- 「今月分」だけを対象にする(毎月リセットされるランキング)
 create or replace view public.user_completion_stats as
 select
   p.id as user_id,
@@ -140,7 +141,10 @@ select
   count(*) filter (where t.status = 'completed') as completed_count,
   count(*) filter (where t.status = 'missed') as missed_count
 from public.profiles p
-left join public.tasks t on t.user_id = p.id and t.status in ('completed', 'missed')
+left join public.tasks t
+  on t.user_id = p.id
+  and t.status in ('completed', 'missed')
+  and t.completed_at >= (date_trunc('month', now() at time zone 'Asia/Tokyo') at time zone 'Asia/Tokyo')
 group by p.id, p.display_name;
 
 grant select on public.user_completion_stats to authenticated;
@@ -150,6 +154,7 @@ select distinct
   t.user_id,
   (t.completed_at at time zone 'Asia/Tokyo')::date as completed_day
 from public.tasks t
-where t.status = 'completed';
+where t.status = 'completed'
+  and t.completed_at >= (date_trunc('month', now() at time zone 'Asia/Tokyo') at time zone 'Asia/Tokyo');
 
 grant select on public.user_completion_days to authenticated;

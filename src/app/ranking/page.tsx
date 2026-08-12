@@ -112,12 +112,17 @@ export default async function RankingPage() {
     .sort((a, b) => (b.rate ?? 0) - (a.rate ?? 0))
     .map((r) => ({ name: r.name, value: r.rate ?? 0 }));
 
+  const monthLabel = new Intl.DateTimeFormat("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    month: "long",
+  }).format(new Date());
+
   return (
     <div className="min-h-screen pb-24">
       <NavBar />
       <main className="mx-auto max-w-5xl px-4 py-6">
         <h1 className="mb-6 text-lg font-bold text-[var(--foreground)]">
-          ランキング
+          {monthLabel}のランキング
         </h1>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
