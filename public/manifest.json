@@ -1,0 +1,17 @@
+{
+  "name": "完了の間",
+  "short_name": "完了の間",
+  "description": "決めて、やる。を習慣にする",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#111111",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
