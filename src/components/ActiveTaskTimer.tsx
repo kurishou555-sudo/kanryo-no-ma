@@ -12,6 +12,13 @@ import type { Task } from "@/lib/types";
 
 const EXTEND_OPTIONS = [5, 15, 30];
 
+function defaultTimeString(offsetMinutes: number) {
+  const d = new Date(Date.now() + offsetMinutes * 60 * 1000);
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${hh}:${mm}`;
+}
+
 function formatRemaining(ms: number) {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
   const h = Math.floor(totalSeconds / 3600);
@@ -61,7 +68,9 @@ export default function ActiveTaskTimer({
   const [showMissedForm, setShowMissedForm] = useState(false);
   const [noteText, setNoteText] = useState("");
   const [showExtendForm, setShowExtendForm] = useState(false);
-  const [customExtendTime, setCustomExtendTime] = useState("");
+  const [customExtendTime, setCustomExtendTime] = useState(() =>
+    defaultTimeString(5)
+  );
   const notifiedRef = useRef(false);
 
   useEffect(() => {
@@ -156,19 +165,20 @@ export default function ActiveTaskTimer({
       >
         完了
       </button>
+
       <button
         onClick={() => onCancel(task.id)}
         disabled={busy}
-        className="relative mt-2 w-full py-2 text-sm text-[var(--muted)] hover:text-[var(--foreground)] disabled:opacity-50"
+        className="relative mt-6 w-full rounded-xl border border-[var(--border-strong)] py-2.5 text-sm font-medium text-[var(--muted)] hover:text-[var(--foreground)] disabled:opacity-50"
       >
         取り消す
       </button>
 
-      <div className="relative mt-4 border-t border-[var(--border)] pt-4 text-left">
+      <div className="relative mt-6 border-t border-[var(--border)] pt-5 text-left">
         {!showExtendForm ? (
           <button
             onClick={() => setShowExtendForm(true)}
-            className="w-full text-center text-sm text-[var(--muted)] underline underline-offset-2 hover:text-[var(--foreground)]"
+            className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] py-2.5 text-center text-sm font-medium text-[var(--foreground)] hover:border-[var(--accent)]"
           >
             時間を延長する
           </button>
@@ -213,11 +223,11 @@ export default function ActiveTaskTimer({
       </div>
 
       {isOverdue && (
-        <div className="relative mt-4 border-t border-[var(--border)] pt-4 text-left">
+        <div className="relative mt-6 border-t border-[var(--border)] pt-5 text-left">
           {!showMissedForm ? (
             <button
               onClick={() => setShowMissedForm(true)}
-              className="w-full text-center text-sm text-[var(--muted)] underline underline-offset-2 hover:text-[var(--foreground)]"
+              className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] py-2.5 text-center text-sm font-medium text-[var(--foreground)] hover:border-orange-400"
             >
               できなかった(改善メモを残す)
             </button>

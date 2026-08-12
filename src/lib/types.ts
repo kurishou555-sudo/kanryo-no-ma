@@ -14,9 +14,17 @@ export type Task = {
 export type Profile = {
   id: string;
   display_name: string;
+  display_name_set: boolean;
   created_at: string;
 };
 
 export type TimelineEntry = Task & {
   profiles: Pick<Profile, "display_name"> | null;
+};
+
+export type StockItem = {
+  id: string;
+  user_id: string;
+  title: string;
+  created_at: string;
 };

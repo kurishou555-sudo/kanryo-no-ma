@@ -113,8 +113,7 @@ export default function TaskHistory({ tasks }: { tasks: Task[] }) {
     });
   }
 
-  function handleDelete(taskId: string, title: string) {
-    if (!window.confirm(`「${title}」を削除します。よろしいですか?`)) return;
+  function handleDelete(taskId: string) {
     startTransition(async () => {
       await deleteTask(taskId);
     });
@@ -203,7 +202,7 @@ export default function TaskHistory({ tasks }: { tasks: Task[] }) {
                             ` ・記録 ${formatTime(task.completed_at)}`}
                         </p>
                       </div>
-                      <div className="flex shrink-0 items-center gap-2">
+                      <div className="flex shrink-0 items-center gap-3">
                         <span
                           className={`rounded-full px-2 py-1 text-xs font-medium ${
                             task.status === "completed"
@@ -219,24 +218,26 @@ export default function TaskHistory({ tasks }: { tasks: Task[] }) {
                               ? "未達成"
                               : "進行中"}
                         </span>
-                        <button
-                          type="button"
-                          onClick={() => handleStartEdit(task)}
-                          disabled={isPending}
-                          aria-label="メモ"
-                          className="text-[var(--muted)] hover:text-[var(--accent)] disabled:opacity-50"
-                        >
-                          <MemoIcon />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(task.id, task.title)}
-                          disabled={isPending}
-                          aria-label="削除"
-                          className="text-[var(--muted)] hover:text-red-400 disabled:opacity-50"
-                        >
-                          <TrashIcon />
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleStartEdit(task)}
+                            disabled={isPending}
+                            aria-label="メモ"
+                            className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--accent)] disabled:opacity-50"
+                          >
+                            <MemoIcon />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(task.id)}
+                            disabled={isPending}
+                            aria-label="削除"
+                            className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--muted)] hover:border-red-400 hover:text-red-400 disabled:opacity-50"
+                          >
+                            <TrashIcon />
+                          </button>
+                        </div>
                       </div>
                     </div>
 

@@ -166,13 +166,87 @@ export async function updateDisplayName(displayName: string) {
 
   const { error } = await supabase
     .from("profiles")
-    .update({ display_name: trimmed })
+    .update({ display_name: trimmed, display_name_set: true })
     .eq("id", user.id);
 
   if (error) throw new Error(error.message);
 
   revalidatePath("/dashboard");
   revalidatePath("/timeline");
+}
+
+export async function addStockItem(title: string) {
+  const supabase = await createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
+  if (!user) throw new Error("ログインが必要です");
+
+  const trimmed = title.trim();
+  if (!trimmed) throw new Error("内容を入力してください");
+
+  const { error } = await supabase
+    .from("task_stock")
+    .insert({ user_id: user.id, title: trimmed });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/dashboard");
+}
+
+export async function deleteStockItem(stockId: string) {
+  const supabase = await createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
+  if (!user) throw new Error("ログインが必要です");
+
+  const { error } = await supabase
+    .from("task_stock")
+    .delete()
+    .eq("id", stockId)
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/dashboard");
+}
+
+export async function startStockItem(stockId: string, deadlineAt: string) {
+  const supabase = await createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
+  if (!user) throw new Error("ログインが必要です");
+
+  const { data: stockItem, error: fetchError } = await supabase
+    .from("task_stock")
+    .select("title")
+    .eq("id", stockId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (fetchError || !stockItem) throw new Error("ストックが見つかりません");
+
+  const { error: insertError } = await supabase.from("tasks").insert({
+    user_id: user.id,
+    title: stockItem.title,
+    deadline_at: deadlineAt,
+  });
+
+  if (insertError) {
+    if (insertError.code === "23505") {
+      throw new Error("すでに進行中のタスクがあります");
+    }
+    throw new Error(insertError.message);
+  }
+
+  await supabase.from("task_stock").delete().eq("id", stockId);
+
+  revalidatePath("/dashboard");
 }
 
 export async function logout() {

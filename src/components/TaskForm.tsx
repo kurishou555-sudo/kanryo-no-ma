@@ -4,17 +4,26 @@ import { useState, type FormEvent } from "react";
 
 const QUICK_OPTIONS = [5, 15, 30, 60];
 
+function defaultTimeString(offsetMinutes: number) {
+  const d = new Date(Date.now() + offsetMinutes * 60 * 1000);
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${hh}:${mm}`;
+}
+
 export default function TaskForm({
   onCreate,
   isPending,
   error,
+  initialTitle = "",
 }: {
   onCreate: (title: string, deadlineAt: string) => void;
   isPending: boolean;
   error: string;
+  initialTitle?: string;
 }) {
-  const [title, setTitle] = useState("");
-  const [customTime, setCustomTime] = useState("");
+  const [title, setTitle] = useState(initialTitle);
+  const [customTime, setCustomTime] = useState(() => defaultTimeString(5));
   const [localError, setLocalError] = useState("");
 
   function submitWithDeadline(deadline: Date) {
@@ -25,7 +34,7 @@ export default function TaskForm({
     }
     onCreate(title, deadline.toISOString());
     setTitle("");
-    setCustomTime("");
+    setCustomTime(defaultTimeString(5));
   }
 
   function handleQuick(minutes: number) {

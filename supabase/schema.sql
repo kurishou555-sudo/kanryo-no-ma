@@ -5,8 +5,12 @@
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   display_name text not null default '名無しさん',
+  display_name_set boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+alter table public.profiles
+  add column if not exists display_name_set boolean not null default false;
 
 alter table public.profiles enable row level security;
 
@@ -92,3 +96,27 @@ alter table public.tasks
   drop constraint if exists tasks_status_check;
 alter table public.tasks
   add constraint tasks_status_check check (status in ('active', 'completed', 'missed'));
+
+-- タスクのストック(事前にやりたいことをメモしておく置き場)
+create table if not exists public.task_stock (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles (id) on delete cascade,
+  title text not null check (char_length(trim(title)) > 0),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists task_stock_user_id_idx on public.task_stock (user_id);
+
+alter table public.task_stock enable row level security;
+
+drop policy if exists "task_stock_select_own" on public.task_stock;
+create policy "task_stock_select_own" on public.task_stock
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "task_stock_insert_own" on public.task_stock;
+create policy "task_stock_insert_own" on public.task_stock
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "task_stock_delete_own" on public.task_stock;
+create policy "task_stock_delete_own" on public.task_stock
+  for delete using (auth.uid() = user_id);

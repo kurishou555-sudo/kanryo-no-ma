@@ -8,7 +8,7 @@ export default function NavBar() {
       <span className="font-bold tracking-tight text-[var(--foreground)]">
         完了<span className="text-[var(--accent)]">の間</span>
       </span>
-      <div className="flex items-center gap-3 text-sm text-[var(--muted)]">
+      <div className="flex items-center gap-4 text-sm text-[var(--muted)]">
         <Link href="/dashboard" className="hover:text-[var(--foreground)]">
           マイページ
         </Link>
@@ -16,8 +16,11 @@ export default function NavBar() {
           タイムライン
         </Link>
         <ThemeToggle />
-        <form action={logout}>
-          <button type="submit" className="hover:text-[var(--foreground)]">
+        <form action={logout} className="ml-1 border-l border-[var(--border)] pl-4">
+          <button
+            type="submit"
+            className="rounded-full border border-[var(--border-strong)] px-3 py-1 text-xs text-[var(--muted)] hover:border-red-400 hover:text-red-400"
+          >
             ログアウト
           </button>
         </form>
