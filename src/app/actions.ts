@@ -221,6 +221,28 @@ export async function updateStockRoutine(stockId: string, isRoutine: boolean) {
   revalidatePath("/dashboard");
 }
 
+export async function updateStockTitle(stockId: string, title: string) {
+  const supabase = await createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
+  if (!user) throw new Error("ログインが必要です");
+
+  const trimmed = title.trim();
+  if (!trimmed) throw new Error("内容を入力してください");
+
+  const { error } = await supabase
+    .from("task_stock")
+    .update({ title: trimmed })
+    .eq("id", stockId)
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/dashboard");
+}
+
 export async function updateStockDuration(
   stockId: string,
   durationMinutes: number

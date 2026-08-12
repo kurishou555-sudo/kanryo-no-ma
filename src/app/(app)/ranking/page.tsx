@@ -1,6 +1,4 @@
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import NavBar from "@/components/NavBar";
 import { computeStreak } from "@/lib/streak";
 
 type StatsRow = {
@@ -71,10 +69,6 @@ function RankingCard({
 
 export default async function RankingPage() {
   const supabase = await createClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (!session?.user) redirect("/login");
 
   const [{ data: stats }, { data: days }] = await Promise.all([
     supabase.from("user_completion_stats").select("*"),
@@ -118,18 +112,15 @@ export default async function RankingPage() {
   }).format(new Date());
 
   return (
-    <div className="min-h-screen pb-24">
-      <NavBar />
-      <main className="mx-auto max-w-5xl px-4 py-6">
-        <h1 className="mb-6 text-lg font-bold text-[var(--foreground)]">
-          {monthLabel}のランキング
-        </h1>
+    <main className="mx-auto max-w-5xl px-4 py-6">
+      <h1 className="mb-6 text-lg font-bold text-[var(--foreground)]">
+        {monthLabel}のランキング
+      </h1>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
-          <RankingCard title="継続日数" unit="日" entries={byStreak} />
-          <RankingCard title="完了率" unit="%" entries={byRate} />
-        </div>
-      </main>
-    </div>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
+        <RankingCard title="継続日数" unit="日" entries={byStreak} />
+        <RankingCard title="完了率" unit="%" entries={byRate} />
+      </div>
+    </main>
   );
 }

@@ -138,7 +138,7 @@ export default function TaskHistory({ tasks }: { tasks: Task[] }) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="max-h-[32rem] space-y-2 overflow-y-auto pr-1">
       {groups.map((group) => {
         const isOpen = openDates.has(group.key);
         const completedCount = group.tasks.filter(

@@ -7,6 +7,7 @@ import {
   startStockItem,
   updateStockRoutine,
   updateStockDuration,
+  updateStockTitle,
 } from "@/app/actions";
 import type { StockItem } from "@/lib/types";
 
@@ -88,6 +89,18 @@ export default function StockList({ items }: { items: StockItem[] }) {
     });
   }
 
+  function handleUpdateTitle(stockId: string, nextTitle: string) {
+    if (!nextTitle.trim()) return;
+    setError("");
+    startTransition(async () => {
+      try {
+        await updateStockTitle(stockId, nextTitle);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "変更に失敗しました");
+      }
+    });
+  }
+
   return (
     <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
       <h2 className="mb-1.5 text-lg font-bold text-[var(--foreground)]">
@@ -162,10 +175,18 @@ export default function StockList({ items }: { items: StockItem[] }) {
               key={item.id}
               className="flex items-center justify-between gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm"
             >
-              <div className="min-w-0">
-                <p className="truncate text-[var(--foreground)]">
-                  {item.title}
-                </p>
+              <div className="min-w-0 flex-1">
+                <input
+                  type="text"
+                  defaultValue={item.title}
+                  onBlur={(e) => {
+                    if (e.target.value.trim() !== item.title) {
+                      handleUpdateTitle(item.id, e.target.value);
+                    }
+                  }}
+                  disabled={isPending}
+                  className="w-full rounded-lg border border-transparent bg-transparent px-1 py-0.5 text-[var(--foreground)] outline-none hover:border-[var(--border-strong)] focus:border-[var(--accent)] focus:bg-[var(--surface)] disabled:opacity-50"
+                />
                 <div className="mt-1 flex items-center gap-3 text-xs text-[var(--muted)]">
                   <span className="flex items-center gap-1">
                     <input
