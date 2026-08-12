@@ -44,11 +44,15 @@ export default async function DashboardPage() {
       />
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
+        <section>
+          <TaskSection
+            initialActiveTask={(activeTask as Task | null) ?? null}
+          />
+        </section>
+
         <div className="space-y-6">
           <section>
-            <TaskSection
-              initialActiveTask={(activeTask as Task | null) ?? null}
-            />
+            <StockList items={(stock as StockItem[]) ?? []} />
           </section>
 
           <section>
@@ -58,10 +62,6 @@ export default async function DashboardPage() {
             <TaskHistory tasks={(history as Task[]) ?? []} />
           </section>
         </div>
-
-        <section>
-          <StockList items={(stock as StockItem[]) ?? []} />
-        </section>
       </div>
     </main>
   );

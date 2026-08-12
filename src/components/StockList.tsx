@@ -128,13 +128,24 @@ export default function StockList({ items }: { items: StockItem[] }) {
         </span>
       </button>
 
-      {!isOpen ? (
+      {!isOpen && (
         <p className="mt-1.5 text-sm text-[var(--muted)]">
           今は進行中のタスクだけ表示しています。開くとストック一覧が見られます。
         </p>
-      ) : (
-        <div className="max-h-[70vh] overflow-y-auto">
-          <p className="mb-4 mt-1.5 text-sm text-[var(--muted)]">
+      )}
+
+      <div
+        className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
+          isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div
+          className={`overflow-hidden transition-opacity duration-300 ${
+            isOpen ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <div className="max-h-[70vh] overflow-y-auto pt-1.5">
+          <p className="mb-4 text-sm text-[var(--muted)]">
             あとでやりたいことを書き溜めておけます。「開始」を押すと、その場でタイマーが始まります。
           </p>
 
@@ -272,8 +283,9 @@ export default function StockList({ items }: { items: StockItem[] }) {
       )}
 
           {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
