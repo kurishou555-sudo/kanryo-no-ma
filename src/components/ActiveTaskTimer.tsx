@@ -35,15 +35,26 @@ function playBeep() {
       (window as unknown as { webkitAudioContext: typeof AudioContext })
         .webkitAudioContext;
     const ctx = new AudioContextClass();
-    const oscillator = ctx.createOscillator();
-    const gain = ctx.createGain();
-    oscillator.connect(gain);
-    gain.connect(ctx.destination);
-    oscillator.frequency.value = 880;
-    gain.gain.setValueAtTime(0.2, ctx.currentTime);
-    oscillator.start();
-    oscillator.stop(ctx.currentTime + 0.6);
-    oscillator.onended = () => ctx.close();
+    const now = ctx.currentTime;
+
+    // 「ピピー、ピピー」のようなアラーム音(短い音を4回)
+    const beepStarts = [0, 0.18, 0.55, 0.73];
+    const beepDuration = 0.15;
+
+    beepStarts.forEach((offset) => {
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+      oscillator.frequency.value = 1000;
+      gain.gain.setValueAtTime(0.25, now + offset);
+      oscillator.start(now + offset);
+      oscillator.stop(now + offset + beepDuration);
+    });
+
+    const totalMs =
+      (beepStarts[beepStarts.length - 1] + beepDuration + 0.1) * 1000;
+    setTimeout(() => ctx.close(), totalMs);
   } catch {
     // 音を鳴らせない環境では無視
   }
@@ -157,10 +168,10 @@ export default function ActiveTaskTimer({
         }}
       />
 
-      <p className="relative mb-1 text-sm font-medium text-[var(--muted)]">
+      <p className="relative mb-1.5 text-base font-medium text-[var(--muted)]">
         進行中のタスク
       </p>
-      <p className="relative mb-5 text-xl font-bold text-[var(--foreground)]">
+      <p className="relative mb-5 text-3xl font-bold text-[var(--foreground)]">
         {task.title}
       </p>
 
@@ -198,9 +209,18 @@ export default function ActiveTaskTimer({
           </button>
         ) : (
           <div>
-            <p className="mb-2 text-sm font-medium text-[var(--muted)]">
-              延長する
-            </p>
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-sm font-medium text-[var(--muted)]">
+                延長する
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowExtendForm(false)}
+                className="text-xs text-[var(--muted)] underline underline-offset-2 hover:text-[var(--foreground)]"
+              >
+                閉じる
+              </button>
+            </div>
             <div className="mb-3 flex flex-wrap gap-2">
               {EXTEND_OPTIONS.map((m) => (
                 <button
@@ -271,12 +291,21 @@ export default function ActiveTaskTimer({
             </button>
           ) : (
             <div>
-              <label
-                htmlFor="missed-note"
-                className="mb-1 block text-sm font-medium text-[var(--muted)]"
-              >
-                次はどうする?一言メモ
-              </label>
+              <div className="mb-1 flex items-center justify-between">
+                <label
+                  htmlFor="missed-note"
+                  className="text-sm font-medium text-[var(--muted)]"
+                >
+                  次はどうする?一言メモ
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowMissedForm(false)}
+                  className="text-xs text-[var(--muted)] underline underline-offset-2 hover:text-[var(--foreground)]"
+                >
+                  閉じる
+                </button>
+              </div>
               <textarea
                 id="missed-note"
                 value={noteText}

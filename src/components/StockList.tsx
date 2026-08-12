@@ -129,7 +129,7 @@ export default function StockList({ items }: { items: StockItem[] }) {
       </button>
 
       {!isOpen ? (
-        <p className="mt-1.5 text-xs text-[var(--muted)]">
+        <p className="mt-1.5 text-sm text-[var(--muted)]">
           今は進行中のタスクだけ表示しています。開くとストック一覧が見られます。
         </p>
       ) : (
