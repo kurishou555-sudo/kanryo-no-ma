@@ -32,6 +32,7 @@ function TrashIcon() {
 }
 
 export default function StockList({ items }: { items: StockItem[] }) {
+  const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [duration, setDuration] = useState(5);
   const [isRoutine, setIsRoutine] = useState(false);
@@ -103,14 +104,41 @@ export default function StockList({ items }: { items: StockItem[] }) {
 
   return (
     <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
-      <h2 className="mb-1.5 text-lg font-bold text-[var(--foreground)]">
-        ストック
-      </h2>
-      <p className="mb-4 text-xs text-[var(--muted)]">
-        あとでやりたいことを書き溜めておけます。「開始」を押すと、その場でタイマーが始まります。
-      </p>
+      <button
+        type="button"
+        onClick={() => setIsOpen((v) => !v)}
+        className="flex w-full items-center justify-between text-left"
+      >
+        <span className="flex items-center gap-2">
+          <h2 className="text-lg font-bold text-[var(--foreground)]">
+            ストック
+          </h2>
+          {items.length > 0 && (
+            <span className="rounded-full bg-[var(--accent-dim)] px-2 py-0.5 text-xs font-medium text-[var(--accent)]">
+              {items.length}
+            </span>
+          )}
+        </span>
+        <span
+          className={`text-[var(--muted)] transition-transform ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        >
+          ▼
+        </span>
+      </button>
 
-      <form onSubmit={handleAdd} className="mb-4">
+      {!isOpen ? (
+        <p className="mt-1.5 text-xs text-[var(--muted)]">
+          今は進行中のタスクだけ表示しています。開くとストック一覧が見られます。
+        </p>
+      ) : (
+        <>
+          <p className="mb-4 mt-1.5 text-xs text-[var(--muted)]">
+            あとでやりたいことを書き溜めておけます。「開始」を押すと、その場でタイマーが始まります。
+          </p>
+
+          <form onSubmit={handleAdd} className="mb-4">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -243,7 +271,9 @@ export default function StockList({ items }: { items: StockItem[] }) {
         </ul>
       )}
 
-      {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+          {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+        </>
+      )}
     </div>
   );
 }
