@@ -10,7 +10,7 @@ import {
 import { extendTask } from "@/app/actions";
 import type { Task } from "@/lib/types";
 
-const EXTEND_OPTIONS = [5, 15, 30];
+const EXTEND_OPTIONS = [1, 3, 5, 15, 30];
 
 function defaultTimeString(offsetMinutes: number) {
   const d = new Date(Date.now() + offsetMinutes * 60 * 1000);
@@ -71,6 +71,7 @@ export default function ActiveTaskTimer({
   const [customExtendTime, setCustomExtendTime] = useState(() =>
     defaultTimeString(5)
   );
+  const [customExtendMinutes, setCustomExtendMinutes] = useState("");
   const notifiedRef = useRef(false);
 
   useEffect(() => {
@@ -109,6 +110,19 @@ export default function ActiveTaskTimer({
     const newDeadline = new Date(deadline + minutes * 60 * 1000);
     startExtendTransition(async () => {
       await extendTask(task.id, newDeadline.toISOString());
+    });
+  }
+
+  function handleExtendCustomMinutesSubmit(e: FormEvent) {
+    e.preventDefault();
+    const minutes = Number(customExtendMinutes);
+    if (!customExtendMinutes || !Number.isFinite(minutes) || minutes <= 0) {
+      return;
+    }
+    const newDeadline = new Date(deadline + minutes * 60 * 1000);
+    startExtendTransition(async () => {
+      await extendTask(task.id, newDeadline.toISOString());
+      setCustomExtendMinutes("");
     });
   }
 
@@ -200,24 +214,48 @@ export default function ActiveTaskTimer({
                 </button>
               ))}
             </div>
-            <form
-              onSubmit={handleExtendCustomSubmit}
-              className="flex items-center gap-2"
-            >
-              <input
-                type="time"
-                value={customExtendTime}
-                onChange={(e) => setCustomExtendTime(e.target.value)}
-                className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-base text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
-              />
-              <button
-                type="submit"
-                disabled={busy}
-                className="rounded-xl bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--accent-foreground)] disabled:opacity-50"
+            <div className="flex flex-wrap items-center gap-2">
+              <form
+                onSubmit={handleExtendCustomSubmit}
+                className="flex items-center gap-2"
               >
-                この時刻に変更
-              </button>
-            </form>
+                <input
+                  type="time"
+                  value={customExtendTime}
+                  onChange={(e) => setCustomExtendTime(e.target.value)}
+                  className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-base text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
+                />
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="rounded-xl bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--accent-foreground)] disabled:opacity-50"
+                >
+                  この時刻に変更
+                </button>
+              </form>
+
+              <form
+                onSubmit={handleExtendCustomMinutesSubmit}
+                className="flex items-center gap-2"
+              >
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  value={customExtendMinutes}
+                  onChange={(e) => setCustomExtendMinutes(e.target.value)}
+                  placeholder="分数"
+                  className="w-20 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-base text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent)]"
+                />
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2 text-sm font-medium text-[var(--foreground)] hover:border-[var(--accent)] disabled:opacity-50"
+                >
+                  分延長
+                </button>
+              </form>
+            </div>
           </div>
         )}
       </div>

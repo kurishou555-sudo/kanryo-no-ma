@@ -6,10 +6,11 @@ import {
   deleteStockItem,
   startStockItem,
   updateStockRoutine,
+  updateStockDuration,
 } from "@/app/actions";
 import type { StockItem } from "@/lib/types";
 
-const DURATION_OPTIONS = [5, 15, 30, 60];
+const DURATION_OPTIONS = [1, 3, 5, 15, 30, 60];
 
 function TrashIcon() {
   return (
@@ -75,6 +76,18 @@ export default function StockList({ items }: { items: StockItem[] }) {
     });
   }
 
+  function handleUpdateDuration(stockId: string, minutes: number) {
+    if (!Number.isFinite(minutes) || minutes <= 0) return;
+    setError("");
+    startTransition(async () => {
+      try {
+        await updateStockDuration(stockId, minutes);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "変更に失敗しました");
+      }
+    });
+  }
+
   return (
     <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
       <h2 className="mb-1.5 text-lg font-bold text-[var(--foreground)]">
@@ -92,7 +105,7 @@ export default function StockList({ items }: { items: StockItem[] }) {
           className="mb-2 w-full rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2.5 text-base text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent)]"
         />
 
-        <div className="mb-2 flex flex-wrap gap-2">
+        <div className="mb-2 flex flex-wrap items-center gap-2">
           {DURATION_OPTIONS.map((m) => (
             <button
               key={m}
@@ -107,6 +120,17 @@ export default function StockList({ items }: { items: StockItem[] }) {
               {m}分
             </button>
           ))}
+          <span className="flex items-center gap-1 text-xs text-[var(--muted)]">
+            <input
+              type="number"
+              inputMode="numeric"
+              min={1}
+              value={duration}
+              onChange={(e) => setDuration(Number(e.target.value))}
+              className="w-14 rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] px-2 py-1 text-center text-xs text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
+            />
+            分
+          </span>
         </div>
 
         <div className="mb-3 flex items-center justify-between gap-2">
@@ -143,7 +167,23 @@ export default function StockList({ items }: { items: StockItem[] }) {
                   {item.title}
                 </p>
                 <div className="mt-1 flex items-center gap-3 text-xs text-[var(--muted)]">
-                  <span>{item.duration_minutes}分</span>
+                  <span className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      min={1}
+                      defaultValue={item.duration_minutes}
+                      onBlur={(e) => {
+                        const value = Number(e.target.value);
+                        if (value > 0 && value !== item.duration_minutes) {
+                          handleUpdateDuration(item.id, value);
+                        }
+                      }}
+                      disabled={isPending}
+                      className="w-12 rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] px-1.5 py-0.5 text-center text-xs text-[var(--foreground)] outline-none focus:border-[var(--accent)] disabled:opacity-50"
+                    />
+                    分
+                  </span>
                   <label className="flex items-center gap-1.5">
                     <input
                       type="checkbox"
