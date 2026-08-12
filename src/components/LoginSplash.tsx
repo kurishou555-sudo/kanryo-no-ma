@@ -37,7 +37,7 @@ export default function LoginSplash() {
       style={{ animation: `splash-overlay ${DURATION_MS}ms ease-in-out forwards` }}
     >
       <p
-        className="splash-text px-8 text-center text-2xl font-bold leading-relaxed text-[var(--foreground)]"
+        className="splash-text px-8 text-center text-4xl font-bold leading-relaxed text-[var(--foreground)] sm:text-5xl"
         style={{ animation: `splash-text ${DURATION_MS}ms ease-in-out forwards` }}
       >
         決めて、<span className="text-[var(--accent)]">やる。</span>

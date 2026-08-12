@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 
-const QUICK_OPTIONS = [1, 3, 5, 15, 30, 60];
+const QUICK_OPTIONS = [1, 3, 5, 15, 30];
 
 function defaultTimeString(offsetMinutes: number) {
   const d = new Date(Date.now() + offsetMinutes * 60 * 1000);

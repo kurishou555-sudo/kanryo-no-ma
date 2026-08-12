@@ -10,7 +10,7 @@ import {
 } from "@/app/actions";
 import type { StockItem } from "@/lib/types";
 
-const DURATION_OPTIONS = [1, 3, 5, 15, 30, 60];
+const DURATION_OPTIONS = [1, 3, 5, 15, 30];
 
 function TrashIcon() {
   return (
