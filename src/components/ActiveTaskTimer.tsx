@@ -82,7 +82,7 @@ export default function ActiveTaskTimer({
   const [customExtendTime, setCustomExtendTime] = useState(() =>
     defaultTimeString(5)
   );
-  const [customExtendMinutes, setCustomExtendMinutes] = useState("");
+  const [extendMinutes, setExtendMinutes] = useState(5);
   const notifiedRef = useRef(false);
 
   useEffect(() => {
@@ -116,24 +116,13 @@ export default function ActiveTaskTimer({
     }
   }, [remaining, task.title]);
 
-  function handleExtendQuick(minutes: number) {
-    // 「今から」ではなく「今の残り時間(期限)」にN分を足す
-    const newDeadline = new Date(deadline + minutes * 60 * 1000);
-    startExtendTransition(async () => {
-      await extendTask(task.id, newDeadline.toISOString());
-    });
-  }
-
-  function handleExtendCustomMinutesSubmit(e: FormEvent) {
+  function handleExtendSubmit(e: FormEvent) {
     e.preventDefault();
-    const minutes = Number(customExtendMinutes);
-    if (!customExtendMinutes || !Number.isFinite(minutes) || minutes <= 0) {
-      return;
-    }
-    const newDeadline = new Date(deadline + minutes * 60 * 1000);
+    if (!Number.isFinite(extendMinutes) || extendMinutes <= 0) return;
+    // 「今から」ではなく「今の残り時間(期限)」にN分を足す
+    const newDeadline = new Date(deadline + extendMinutes * 60 * 1000);
     startExtendTransition(async () => {
       await extendTask(task.id, newDeadline.toISOString());
-      setCustomExtendMinutes("");
     });
   }
 
@@ -221,61 +210,67 @@ export default function ActiveTaskTimer({
                 閉じる
               </button>
             </div>
-            <div className="mb-3 flex flex-wrap gap-2">
-              {EXTEND_OPTIONS.map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  disabled={busy}
-                  onClick={() => handleExtendQuick(m)}
-                  className="rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2 text-sm font-medium text-[var(--foreground)] active:bg-[var(--accent-dim)] active:border-[var(--accent)] disabled:opacity-50"
-                >
-                  +{m}分
-                </button>
-              ))}
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <form
-                onSubmit={handleExtendCustomSubmit}
-                className="flex items-center gap-2"
-              >
-                <input
-                  type="time"
-                  value={customExtendTime}
-                  onChange={(e) => setCustomExtendTime(e.target.value)}
-                  className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-base text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
-                />
+            <form onSubmit={handleExtendSubmit} className="mb-5">
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                {EXTEND_OPTIONS.map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    disabled={busy}
+                    onClick={() => setExtendMinutes(m)}
+                    className={`rounded-full border px-4 py-2 text-sm font-medium disabled:opacity-50 ${
+                      extendMinutes === m
+                        ? "border-[var(--accent)] bg-[var(--accent-dim)] text-[var(--accent)]"
+                        : "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--foreground)]"
+                    }`}
+                  >
+                    +{m}分
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1 text-sm text-[var(--muted)]">
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    value={extendMinutes}
+                    onChange={(e) => setExtendMinutes(Number(e.target.value))}
+                    className="w-16 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-2 py-2 text-center text-base text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
+                  />
+                  分延長
+                </span>
                 <button
                   type="submit"
                   disabled={busy}
                   className="rounded-xl bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--accent-foreground)] disabled:opacity-50"
                 >
-                  この時刻に変更
+                  延長する
                 </button>
-              </form>
+              </div>
+            </form>
 
-              <form
-                onSubmit={handleExtendCustomMinutesSubmit}
-                className="flex items-center gap-2"
+            <p className="mb-2 text-sm font-medium text-[var(--muted)]">
+              または時刻を指定
+            </p>
+            <form
+              onSubmit={handleExtendCustomSubmit}
+              className="flex items-center gap-2"
+            >
+              <input
+                type="time"
+                value={customExtendTime}
+                onChange={(e) => setCustomExtendTime(e.target.value)}
+                className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-base text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
+              />
+              <button
+                type="submit"
+                disabled={busy}
+                className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2 text-sm font-medium text-[var(--foreground)] hover:border-[var(--accent)] disabled:opacity-50"
               >
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  min={1}
-                  value={customExtendMinutes}
-                  onChange={(e) => setCustomExtendMinutes(e.target.value)}
-                  placeholder="分数"
-                  className="w-20 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-base text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent)]"
-                />
-                <button
-                  type="submit"
-                  disabled={busy}
-                  className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2 text-sm font-medium text-[var(--foreground)] hover:border-[var(--accent)] disabled:opacity-50"
-                >
-                  分延長
-                </button>
-              </form>
-            </div>
+                この時刻に変更
+              </button>
+            </form>
           </div>
         )}
       </div>

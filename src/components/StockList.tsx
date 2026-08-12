@@ -134,7 +134,7 @@ export default function StockList({ items }: { items: StockItem[] }) {
         </p>
       ) : (
         <>
-          <p className="mb-4 mt-1.5 text-xs text-[var(--muted)]">
+          <p className="mb-4 mt-1.5 text-sm text-[var(--muted)]">
             あとでやりたいことを書き溜めておけます。「開始」を押すと、その場でタイマーが始まります。
           </p>
 
@@ -152,7 +152,7 @@ export default function StockList({ items }: { items: StockItem[] }) {
               key={m}
               type="button"
               onClick={() => setDuration(m)}
-              className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+              className={`rounded-full border px-3 py-1.5 text-sm font-medium ${
                 duration === m
                   ? "border-[var(--accent)] bg-[var(--accent-dim)] text-[var(--accent)]"
                   : "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--foreground)]"
@@ -161,21 +161,21 @@ export default function StockList({ items }: { items: StockItem[] }) {
               {m}分
             </button>
           ))}
-          <span className="flex items-center gap-1 text-xs text-[var(--muted)]">
+          <span className="flex items-center gap-1 text-sm text-[var(--muted)]">
             <input
               type="number"
               inputMode="numeric"
               min={1}
               value={duration}
               onChange={(e) => setDuration(Number(e.target.value))}
-              className="w-14 rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] px-2 py-1 text-center text-xs text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
+              className="w-14 rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] px-2 py-1 text-center text-sm text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
             />
             分
           </span>
         </div>
 
         <div className="mb-3 flex items-center justify-between gap-2">
-          <label className="flex items-center gap-2 text-xs text-[var(--muted)]">
+          <label className="flex items-center gap-2 text-sm text-[var(--muted)]">
             <input
               type="checkbox"
               checked={isRoutine}
@@ -215,7 +215,7 @@ export default function StockList({ items }: { items: StockItem[] }) {
                   disabled={isPending}
                   className="w-full rounded-lg border border-transparent bg-transparent px-1 py-0.5 text-[var(--foreground)] outline-none hover:border-[var(--border-strong)] focus:border-[var(--accent)] focus:bg-[var(--surface)] disabled:opacity-50"
                 />
-                <div className="mt-1 flex items-center gap-3 text-xs text-[var(--muted)]">
+                <div className="mt-1 flex items-center gap-3 text-sm text-[var(--muted)]">
                   <span className="flex items-center gap-1">
                     <input
                       type="number"
@@ -229,7 +229,7 @@ export default function StockList({ items }: { items: StockItem[] }) {
                         }
                       }}
                       disabled={isPending}
-                      className="w-12 rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] px-1.5 py-0.5 text-center text-xs text-[var(--foreground)] outline-none focus:border-[var(--accent)] disabled:opacity-50"
+                      className="w-12 rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] px-1.5 py-0.5 text-center text-sm text-[var(--foreground)] outline-none focus:border-[var(--accent)] disabled:opacity-50"
                     />
                     分
                   </span>
@@ -252,7 +252,7 @@ export default function StockList({ items }: { items: StockItem[] }) {
                   type="button"
                   onClick={() => handleStart(item.id)}
                   disabled={isPending}
-                  className="rounded-full bg-[var(--accent)] px-3.5 py-1.5 text-xs font-bold text-[var(--accent-foreground)] disabled:opacity-50"
+                  className="rounded-full bg-[var(--accent)] px-3.5 py-1.5 text-sm font-bold text-[var(--accent-foreground)] disabled:opacity-50"
                 >
                   開始
                 </button>

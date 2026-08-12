@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+html {
+  /* 全体的に文字を大きめにして読みやすくする */
+  font-size: 125%;
+}
+
 :root {
   --background: #fbfaf7;
   --foreground: #1a1917;

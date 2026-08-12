@@ -85,7 +85,7 @@ export default function TaskForm({
 
       <label
         htmlFor="title"
-        className="mb-1.5 block text-sm font-medium text-[var(--muted)]"
+        className="mb-1.5 block text-base font-medium text-[var(--muted)]"
       >
         何をする?
       </label>
@@ -98,7 +98,7 @@ export default function TaskForm({
         className="mb-5 w-full rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3 text-base text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent)]"
       />
 
-      <p className="mb-2 text-sm font-medium text-[var(--muted)]">
+      <p className="mb-2 text-base font-medium text-[var(--muted)]">
         いつまでに?
       </p>
       <form onSubmit={handleMinutesSubmit} className="mb-4">
@@ -109,7 +109,7 @@ export default function TaskForm({
               type="button"
               disabled={isPending}
               onClick={() => setMinutes(m)}
-              className={`rounded-full border px-4 py-2 text-sm font-medium disabled:opacity-50 ${
+              className={`rounded-full border px-4 py-2 text-base font-medium disabled:opacity-50 ${
                 minutes === m
                   ? "border-[var(--accent)] bg-[var(--accent-dim)] text-[var(--accent)]"
                   : "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--foreground)]"
@@ -141,7 +141,7 @@ export default function TaskForm({
         </div>
       </form>
 
-      <p className="mb-2 text-sm font-medium text-[var(--muted)]">
+      <p className="mb-2 text-base font-medium text-[var(--muted)]">
         または時刻を指定
       </p>
       <form onSubmit={handleCustomSubmit} className="flex items-center gap-2">
