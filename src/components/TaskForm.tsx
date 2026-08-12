@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type KeyboardEvent } from "react";
 
 const QUICK_OPTIONS = [1, 3, 5, 15, 30];
 
@@ -48,6 +48,16 @@ export default function TaskForm({
     submitWithDeadline(new Date(Date.now() + minutes * 60 * 1000));
   }
 
+  function handleTitleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    if (!Number.isFinite(minutes) || minutes <= 0) {
+      setLocalError("分数を入力してください");
+      return;
+    }
+    submitWithDeadline(new Date(Date.now() + minutes * 60 * 1000));
+  }
+
   function handleCustomSubmit(e: FormEvent) {
     e.preventDefault();
     if (!customTime) {
@@ -83,6 +93,7 @@ export default function TaskForm({
         id="title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        onKeyDown={handleTitleKeyDown}
         placeholder="例: 歯を磨く"
         className="mb-5 w-full rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3 text-base text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--accent)]"
       />
