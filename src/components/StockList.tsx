@@ -29,25 +29,6 @@ function TrashIcon() {
   );
 }
 
-function RepeatIcon() {
-  return (
-    <svg
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-3 w-3"
-    >
-      <path d="M4 8a5 5 0 0 1 8.5-3.5L14 6" />
-      <path d="M14 3v3.5h-3.5" />
-      <path d="M16 12a5 5 0 0 1-8.5 3.5L6 14" />
-      <path d="M6 17v-3.5h3.5" />
-    </svg>
-  );
-}
-
 export default function StockList({ items }: { items: StockItem[] }) {
   const [title, setTitle] = useState("");
   const [duration, setDuration] = useState(5);
@@ -161,24 +142,20 @@ export default function StockList({ items }: { items: StockItem[] }) {
                 <p className="truncate text-[var(--foreground)]">
                   {item.title}
                 </p>
-                <div className="mt-1 flex items-center gap-1.5 text-xs text-[var(--muted)]">
+                <div className="mt-1 flex items-center gap-3 text-xs text-[var(--muted)]">
                   <span>{item.duration_minutes}分</span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleToggleRoutine(item.id, !item.is_routine)
-                    }
-                    disabled={isPending}
-                    aria-pressed={item.is_routine}
-                    className={`flex items-center gap-1 rounded-full px-2 py-0.5 disabled:opacity-50 ${
-                      item.is_routine
-                        ? "bg-[var(--accent-dim)] text-[var(--accent)]"
-                        : "border border-[var(--border-strong)] text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
-                    }`}
-                  >
-                    <RepeatIcon />
+                  <label className="flex items-center gap-1.5">
+                    <input
+                      type="checkbox"
+                      checked={item.is_routine}
+                      onChange={(e) =>
+                        handleToggleRoutine(item.id, e.target.checked)
+                      }
+                      disabled={isPending}
+                      className="h-3.5 w-3.5 accent-[var(--accent)] disabled:opacity-50"
+                    />
                     ルーティン
-                  </button>
+                  </label>
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">

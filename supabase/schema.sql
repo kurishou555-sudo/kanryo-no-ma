@@ -127,3 +127,29 @@ create policy "task_stock_insert_own" on public.task_stock
 drop policy if exists "task_stock_delete_own" on public.task_stock;
 create policy "task_stock_delete_own" on public.task_stock
   for delete using (auth.uid() = user_id);
+
+drop policy if exists "task_stock_update_own" on public.task_stock;
+create policy "task_stock_update_own" on public.task_stock
+  for update using (auth.uid() = user_id);
+
+-- ランキング用の集計ビュー(個々のタスクの中身は見せず、件数だけを公開する)
+create or replace view public.user_completion_stats as
+select
+  p.id as user_id,
+  p.display_name,
+  count(*) filter (where t.status = 'completed') as completed_count,
+  count(*) filter (where t.status = 'missed') as missed_count
+from public.profiles p
+left join public.tasks t on t.user_id = p.id and t.status in ('completed', 'missed')
+group by p.id, p.display_name;
+
+grant select on public.user_completion_stats to authenticated;
+
+create or replace view public.user_completion_days as
+select distinct
+  t.user_id,
+  (t.completed_at at time zone 'Asia/Tokyo')::date as completed_day
+from public.tasks t
+where t.status = 'completed';
+
+grant select on public.user_completion_days to authenticated;

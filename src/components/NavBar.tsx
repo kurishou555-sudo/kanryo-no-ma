@@ -15,6 +15,9 @@ export default function NavBar() {
         <Link href="/timeline" className="hover:text-[var(--foreground)]">
           タイムライン
         </Link>
+        <Link href="/ranking" className="hover:text-[var(--foreground)]">
+          ランキング
+        </Link>
         <ThemeToggle />
         <form action={logout} className="ml-1 border-l border-[var(--border)] pl-4">
           <button
