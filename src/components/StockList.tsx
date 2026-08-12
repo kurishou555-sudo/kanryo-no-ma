@@ -208,11 +208,11 @@ export default function StockList({ items }: { items: StockItem[] }) {
       {items.length === 0 ? (
         <p className="text-sm text-[var(--muted)]">ストックはまだありません。</p>
       ) : (
-        <ul className="space-y-2">
+        <ul className="max-h-72 space-y-1.5 overflow-y-auto pr-1">
           {items.map((item) => (
             <li
               key={item.id}
-              className="flex items-center justify-between gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm"
+              className="flex items-center justify-between gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-3 py-1.5 text-sm"
             >
               <div className="min-w-0 flex-1">
                 <input
@@ -224,10 +224,10 @@ export default function StockList({ items }: { items: StockItem[] }) {
                     }
                   }}
                   disabled={isPending}
-                  className="w-full rounded-lg border border-transparent bg-transparent px-1 py-0.5 text-[var(--foreground)] outline-none hover:border-[var(--border-strong)] focus:border-[var(--accent)] focus:bg-[var(--surface)] disabled:opacity-50"
+                  className="w-full truncate rounded-md border border-transparent bg-transparent px-1 py-0.5 text-[var(--foreground)] outline-none hover:border-[var(--border-strong)] focus:border-[var(--accent)] focus:bg-[var(--surface)] disabled:opacity-50"
                 />
-                <div className="mt-1 flex items-center gap-3 text-sm text-[var(--muted)]">
-                  <span className="flex items-center gap-1">
+                <div className="flex items-center gap-2 px-1 text-xs text-[var(--muted)]">
+                  <span className="flex items-center gap-0.5">
                     <input
                       type="number"
                       inputMode="numeric"
@@ -240,11 +240,11 @@ export default function StockList({ items }: { items: StockItem[] }) {
                         }
                       }}
                       disabled={isPending}
-                      className="w-12 rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] px-1.5 py-0.5 text-center text-sm text-[var(--foreground)] outline-none focus:border-[var(--accent)] disabled:opacity-50"
+                      className="w-10 rounded border border-[var(--border-strong)] bg-[var(--surface)] px-1 py-0 text-center text-xs text-[var(--foreground)] outline-none focus:border-[var(--accent)] disabled:opacity-50"
                     />
                     分
                   </span>
-                  <label className="flex items-center gap-1.5">
+                  <label className="flex items-center gap-1">
                     <input
                       type="checkbox"
                       checked={item.is_routine}
@@ -252,18 +252,18 @@ export default function StockList({ items }: { items: StockItem[] }) {
                         handleToggleRoutine(item.id, e.target.checked)
                       }
                       disabled={isPending}
-                      className="h-3.5 w-3.5 accent-[var(--accent)] disabled:opacity-50"
+                      className="h-3 w-3 accent-[var(--accent)] disabled:opacity-50"
                     />
                     ルーティン
                   </label>
                 </div>
               </div>
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex shrink-0 items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => handleStart(item.id)}
                   disabled={isPending}
-                  className="rounded-full bg-[var(--accent)] px-3.5 py-1.5 text-sm font-bold text-[var(--accent-foreground)] disabled:opacity-50"
+                  className="rounded-full bg-[var(--accent)] px-3 py-1 text-xs font-bold text-[var(--accent-foreground)] disabled:opacity-50"
                 >
                   開始
                 </button>
@@ -272,7 +272,7 @@ export default function StockList({ items }: { items: StockItem[] }) {
                   onClick={() => handleDelete(item.id)}
                   disabled={isPending}
                   aria-label="削除"
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-strong)] text-[var(--muted)] hover:border-red-400 hover:text-red-400 disabled:opacity-50"
+                  className="flex h-6 w-6 items-center justify-center rounded-full border border-[var(--border-strong)] text-[var(--muted)] hover:border-red-400 hover:text-red-400 disabled:opacity-50"
                 >
                   <TrashIcon />
                 </button>
