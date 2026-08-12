@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const DURATION_MS = 1800;
+const DURATION_MS = 2800;
 
 export default function LoginSplash() {
   const [visible, setVisible] = useState(false);

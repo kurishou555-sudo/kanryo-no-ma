@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
-import { addStockItem, deleteStockItem, startStockItem } from "@/app/actions";
+import {
+  addStockItem,
+  deleteStockItem,
+  startStockItem,
+  updateStockRoutine,
+} from "@/app/actions";
 import type { StockItem } from "@/lib/types";
 
 const DURATION_OPTIONS = [5, 15, 30, 60];
@@ -83,6 +88,12 @@ export default function StockList({ items }: { items: StockItem[] }) {
     });
   }
 
+  function handleToggleRoutine(stockId: string, nextValue: boolean) {
+    startTransition(async () => {
+      await updateStockRoutine(stockId, nextValue);
+    });
+  }
+
   return (
     <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
       <h2 className="mb-1.5 text-lg font-bold text-[var(--foreground)]">
@@ -150,15 +161,25 @@ export default function StockList({ items }: { items: StockItem[] }) {
                 <p className="truncate text-[var(--foreground)]">
                   {item.title}
                 </p>
-                <p className="mt-0.5 flex items-center gap-1.5 text-xs text-[var(--muted)]">
-                  {item.duration_minutes}分
-                  {item.is_routine && (
-                    <span className="flex items-center gap-1 rounded-full bg-[var(--accent-dim)] px-1.5 py-0.5 text-[var(--accent)]">
-                      <RepeatIcon />
-                      ルーティン
-                    </span>
-                  )}
-                </p>
+                <div className="mt-1 flex items-center gap-1.5 text-xs text-[var(--muted)]">
+                  <span>{item.duration_minutes}分</span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleToggleRoutine(item.id, !item.is_routine)
+                    }
+                    disabled={isPending}
+                    aria-pressed={item.is_routine}
+                    className={`flex items-center gap-1 rounded-full px-2 py-0.5 disabled:opacity-50 ${
+                      item.is_routine
+                        ? "bg-[var(--accent-dim)] text-[var(--accent)]"
+                        : "border border-[var(--border-strong)] text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                    }`}
+                  >
+                    <RepeatIcon />
+                    ルーティン
+                  </button>
+                </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <button

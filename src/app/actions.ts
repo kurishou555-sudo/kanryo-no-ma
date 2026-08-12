@@ -202,6 +202,25 @@ export async function addStockItem(
   revalidatePath("/dashboard");
 }
 
+export async function updateStockRoutine(stockId: string, isRoutine: boolean) {
+  const supabase = await createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
+  if (!user) throw new Error("ログインが必要です");
+
+  const { error } = await supabase
+    .from("task_stock")
+    .update({ is_routine: isRoutine })
+    .eq("id", stockId)
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/dashboard");
+}
+
 export async function deleteStockItem(stockId: string) {
   const supabase = await createClient();
   const {
